@@ -17,6 +17,9 @@ router.put("/unfollow/:id", authController.verify, userController.unfollowUser);
 //endpoint to get a desired user
 router.get("/get-user/:id", userController.getUser);
 
+//endpoint to get info of multiple users
+router.post("/get-multiUser", userController.getMultiUser);
+
 //endpoint to get user info from token
 router.get("/get-user", authController.verify, userController.getUserFromToken);
 

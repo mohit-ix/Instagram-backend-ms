@@ -6,7 +6,7 @@ const { DB_URL } = require("../config");
 const dbConnection = async () => {
   try {
     await mongoose.connect(DB_URL);
-    console.log("DataBase Connected");
+    console.log("Post DataBase Connected");
   } catch (err) {
     console.log("Error on Database");
     console.log(err);

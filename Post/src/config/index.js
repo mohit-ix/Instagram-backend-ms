@@ -1,5 +1,4 @@
 const dotenv = require("dotenv");
-const { SECRET_KEY } = require("../../../User/src/config");
 
 const configFile = "./src/.env";
 dotenv.config({ path: configFile });

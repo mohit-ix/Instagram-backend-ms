@@ -1,4 +1,5 @@
 const User = require("../model/user");
+const {redisClient} = require("../redis");
 
 //function to get all the followings of a user
 const getFollowing = async (req, res) => {
@@ -41,7 +42,8 @@ const followUser = async (req, res) => {
       following: true
     });
     const userToFollow = await User.findById(followId, {
-      followers: true
+      followers: true,
+      username: true,
     });
     if(!user.following.includes(followId)) {
       await user.updateOne({
@@ -50,7 +52,8 @@ const followUser = async (req, res) => {
       await userToFollow.updateOne({
         $push: {followers: userId}
       });
-
+      
+      redisClient.publish("followUser", userToFollow.username);
       res.status(200).send({
         status:"success",
         message: "followed successfully"
@@ -79,7 +82,8 @@ const unfollowUser = async (req, res) => {
       following: true
     });
     const userToUnfollow = await User.findById(followId, {
-      followers: true
+      followers: true,
+      username: true
     });
     if(user.following.includes(followId)) {
       await user.updateOne({
@@ -89,6 +93,7 @@ const unfollowUser = async (req, res) => {
         $pull: {followers: userId}
       });
 
+      redisClient.publish("unfollowUser", userToUnfollow.username);
       res.status(200).send({
         status:"success",
         message: "unfollowed successfully"
@@ -125,6 +130,33 @@ const getUser = async (req, res) => {
     });
   }
 };
+
+//function to get info of multiple users
+const getMultiUser = async (req, res) => {
+  try {
+    const uniqueUser = req.body.uniqueUser;
+    const usersInfo = await Promise.all(
+      uniqueUser.map((userId) => {
+        return User.findById(userId, {
+          username: true,
+          profilePicture: true,
+          fullname: true
+        });
+      })
+    );
+
+    res.status(200).send({
+      status: "success",
+      usersInfo
+    })
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      status: "failure",
+      message: err.message,
+    });
+  }
+}
 
 //function to get info of a user from token
 const getUserFromToken = async (req, res) => {
@@ -174,6 +206,7 @@ module.exports = {
   followUser,
   unfollowUser,
   getUser,
+  getMultiUser,
   getUserFromToken,
   searchUsers,
 };
