@@ -78,6 +78,11 @@ const userLogin = async (req, res) => {
           message: "Password does not match",
         });
       }
+    } else {
+      res.status(401).send({
+        status: "failure",
+        message: "user not found"
+      });
     }
   } catch (err) {
     res.status(500).send({

@@ -1,0 +1,1 @@
+module.exports.chatValidation = require("./chat.validation");
